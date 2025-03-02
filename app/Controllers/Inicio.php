@@ -2,14 +2,14 @@
 
 namespace App\Controllers;
 
-use App\Models\BasicModel;
+use App\Models\basicModel;
 use CodeIgniter\Controller;
 
 class Inicio extends Controller {
     protected $basic_modal;
 
     public function __construct(){
-        $this->basic_modal = new BasicModel();
+        $this->basic_modal = new basicModel();
     }
     
     public function index(){
