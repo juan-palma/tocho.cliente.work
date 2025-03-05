@@ -539,12 +539,12 @@ function cortePut(){
 
 
 globAc.vistas = {};
-globAc.vistas.activo = "vistaFrente";
-globAc.vistas.btn = document.id('vistaFrente').addClass('activo');
+//globAc.vistas.activo = "vistaFrente";
+//globAc.vistas.btn = document.id('vistaFrente').addClass('activo');
 
-document.id('prendaNumero').set('data-vista', globAc.vistas.activo);
-document.id('prendaNombre').set('data-vista', globAc.vistas.activo);
-document.id('prendaLogo').set('data-vista', globAc.vistas.activo)
+//document.id('prendaNumero').set('data-vista', globAc.vistas.activo);
+//document.id('prendaNombre').set('data-vista', globAc.vistas.activo);
+//document.id('prendaLogo').set('data-vista', globAc.vistas.activo)
 	
 function controlVistas(){
 	if(globAc.vistas.activo === this.idaVal.val ){ return false; }

@@ -170,6 +170,7 @@ $data_servicio_mensaje  =  array (
 		<script src="<?php echo(base_url('assets/common/js/librerias/formvalid.js')) ?>"></script>
 		<script src="<?php echo(base_url('assets/public/js/owner/main.js')) ?>"></script>
 		
+		
 		<?php
 		?>
 

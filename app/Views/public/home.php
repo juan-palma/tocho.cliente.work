@@ -51,10 +51,10 @@
 
 
 
-<div class="mainbox bl1" style="background-image: url(<?php echo(base_url( 'assets/public/img/home_bl1_fondo.jpg' )); ?> )">
+<!--<div class="mainbox bl1" style="background-image: url(<?php echo(base_url( 'assets/public/img/home_bl1_fondo.jpg' )); ?> )">
 	<div class="homeTitulo"><?php echo(@$inicioDB->inicio_titulo); ?></div>
 	<div class="homeSubtext"><?php echo(@$inicioDB->inicio_subtexto); ?></div>
-</div>
+</div>-->
 
 
 
@@ -63,11 +63,11 @@
 
 <!-- sección HOME QUINES SOMOS -->
 
-<div class="mainbox bl2" style="background-image: url(<?php /* echo(base_url( 'assets/public/img/home_bl1_fondo.jpg' )); */ ?> )">
+<!--<div class="mainbox bl2" style="background-image: url(<?php /* echo(base_url( 'assets/public/img/home_bl1_fondo.jpg' )); */ ?> )">
 	<div class="somosTitulo"><?php echo(@$somosDB->titulo); ?></div>
 	<div class="somosTexto"><?php echo(@$somosDB->texto); ?></div>
 	<a href="<?php echo( base_url('quienes_somos') ); ?>" target="_self"><div class="somosTextoBtn btnVerMas"><?php echo(@$somosDB->textoBtn); ?></div></a>
-</div>
+</div>-->
 
 
 
@@ -111,7 +111,7 @@
 
 <!-- sección HOME PORTAFOLIO -->
 
-<section id="portafolios" class="mainbox bl4">
+<!--<section id="portafolios" class="mainbox bl4">
 	<div class="slideMain">
 		<main class="slideItems">
 			<?php
@@ -142,7 +142,7 @@
 			?>
 		</main>
 	</div>
-</section>
+</section>-->
 
 
 
@@ -153,7 +153,7 @@
 
 <!-- sección HOME CLIENTES -->
 
-<section id="clientes" class="mainbox bl5">
+<!--<section id="clientes" class="mainbox bl5">
 	<div class="slideMain">
 		<?php
 			if(property_exists($clientesDB, "titulo_general") && $clientesDB->titulo_general !== ''){
@@ -175,7 +175,7 @@
 			?>
 		</main>
 	</div>
-</section>
+</section>-->
 
 
 

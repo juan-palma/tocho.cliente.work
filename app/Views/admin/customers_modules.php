@@ -1,8 +1,4 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-
-
 /**
  * Custom Load File CSV:
  * Preferencias para la funcion que va a abrir y recorrer el archivo CSV

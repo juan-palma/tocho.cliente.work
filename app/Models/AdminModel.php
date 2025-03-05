@@ -3,7 +3,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class adminModal extends Model
+class AdminModel extends Model
 {
     protected $table = 'usuarios';
 
@@ -38,5 +38,10 @@ class adminModal extends Model
         if (empty($idUser) || $idUser != 1) {
             return redirect()->to(base_url('admin/home'));
         }
+    }
+
+    public function getAdminSettings()
+    {
+        //return $this->find(1); // Ejemplo, ajusta según tu DB
     }
 }

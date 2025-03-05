@@ -12,38 +12,37 @@ class Politicas_de_privacidad extends Controller {
         $this->basic_modal = new BasicModel();
     }
     
-    public function index(){
+    public function index()
+    {
         $encontrar = array("\r\n", "\n", "\r");
         $remplazar = '';
-        
-        //Consulta - GENERAL
-        $this->basic_modal->clean();
-        $this->basic_modal->tabla = 'contenido';
-        $this->basic_modal->campos = 'contenido_info';
-        $this->basic_modal->condicion = array( "contenido_pagina" => 'general' );
-        
-        $respuesta = $this->basic_modal->genericSelect('sistema');
+
+        // Consulta - GENERAL
+        $respuesta = $this->basic_modal->clean()
+            ->table('contenido')
+            ->select('contenido_info')
+            ->where(['contenido_pagina' => 'general'])
+            ->genericSelect('sistema');
         $consulta = (is_array($respuesta) && count($respuesta) > 0) ? $respuesta[0] : '';
         $clean = (isset($consulta) && property_exists($consulta, 'contenido_info')) ? str_replace($encontrar, $remplazar, $consulta->contenido_info) : '';
-        $cleanObjecDB = ( is_object(json_decode($clean)) ) ? json_decode($clean) : new \stdClass();
+        $cleanObjecDB = (is_object(json_decode($clean))) ? json_decode($clean) : new \stdClass();
         $data['generalDB'] = $cleanObjecDB;
-        
-        //Consulta - HOME-SERVICIOS
-        $this->basic_modal->clean();
-        $this->basic_modal->tabla = 'contenido';
-        $this->basic_modal->campos = 'contenido_info';
-        $this->basic_modal->condicion = array( "contenido_pagina" => 'home', "contenido_seccion" => 'servicios' );
-        
-        $isServicio = $this->basic_modal->genericSelect('sistema');
+
+        // Consulta - HOME-SERVICIOS
+        $isServicio = $this->basic_modal->clean()
+            ->table('contenido')
+            ->select('contenido_info')
+            ->where(['contenido_pagina' => 'home', 'contenido_seccion' => 'servicios'])
+            ->genericSelect('sistema');
         $consulta = (is_array($isServicio) && count($isServicio) > 0) ? $isServicio[0] : '';
         $nuevoValor = (isset($consulta) && property_exists($consulta, 'contenido_info')) ? str_replace($encontrar, $remplazar, $consulta->contenido_info) : '';
-        $valoresDB = ( is_object(json_decode($nuevoValor)) ) ? json_decode($nuevoValor) : new \stdClass();
+        $valoresDB = (is_object(json_decode($nuevoValor))) ? json_decode($nuevoValor) : new \stdClass();
         $data['serviciosDB'] = $valoresDB;
-        
+
         $data['titulo'] = "Políticas de Privacidad";
         $data['actual'] = "politicas";
         $data['desc'] = "Conoce nuestras políticas de privacidad - INMOTION";
-        
+
         echo view('public/head', $data);
         echo view('public/politicas_privacidad', $data);
         echo view('public/footer', $data);

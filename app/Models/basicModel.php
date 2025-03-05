@@ -1,81 +1,165 @@
 <?php
 namespace App\Models;
-use CodeIgniter\Model;
-use CodeIgniter\Files\File;
 
-class basicModel extends Model {
-    public $tabla = '';
-    public $campos = '*';
-    public $join = [];
-    public $condicion = '';
-    public $like = [];
-    public $o = '';
-    public $order = '';
-    public $group = '';
-    public $dir = '';
-    public $limit = '';
-    public $start = '';
-    
-    public function genericSelect($db = ''){
-        $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
-        
-        if($this->tabla == ''){ return false; }
-        
-        $q = $conectDB->table($this->tabla);
-        
-        if($this->campos != '*')
-            $q->select($this->campos);
-        if(!empty($this->join))
-            $q->join($this->join[0], $this->join[1]);
-        if(!empty($this->like))
-            $q->like($this->like);
-        if($this->condicion != '')
-            $q->where($this->condicion);
-        if($this->o != '')
-            $q->orWhere($this->condicion);
-        if($this->order != '')
-            $q->orderBy($this->order, $this->dir);
-        if(!empty($this->group))
-            $q->groupBy($this->group);
-        if($this->limit != '' && $this->start == '')
-            $q->limit($this->limit);
-        if($this->limit != '' && $this->start != '')
-            $q->limit($this->limit, $this->start);
-        
-        $result = $q->get()->getResult();
-        
+use CodeIgniter\Model;
+
+class BasicModel extends Model
+{
+    protected $DBGroup = 'sistema';
+    protected $table = '';
+    protected $primaryKey = 'id';
+    protected $allowedFields = [];
+    protected $returnType = 'object';
+    protected $useTimestamps = false;
+
+    public function table($table)
+    {
+        $this->table = $table;
+
+        switch ($table) {
+            case 'contenido':
+                $this->primaryKey = 'id_contenido';
+                $this->allowedFields = [
+                    'contenido_info',
+                    'contenido_pagina',
+                    'contenido_seccion',
+                    'contenido_user',
+                    'contenido_time',
+                    'contenido_activo'
+                ];
+                $this->useTimestamps = true;
+                $this->createdField = 'contenido_time';
+                $this->updatedField = 'contenido_time';
+                break;
+            case 'archivos':
+                $this->primaryKey = 'id_archivo';
+                $this->allowedFields = [
+                    'id_lead',
+                    'archivo_nombre',
+                    'archivo_formato',
+                    'archivo_extencion',
+                    'archivo_peso',
+                    'archivo_ruta',
+                    'archivo_status'
+                ];
+                break;
+            default:
+                $this->allowedFields = [];
+        }
+
+        return $this;
+    }
+
+    public function select($fields)
+    {
+        $this->builder()->select($fields);
+        return $this;
+    }
+
+    public function where($condition)
+    {
+        $this->builder()->where($condition);
+        return $this;
+    }
+
+    public function findAll(int $limit = null, int $offset = 0)
+    {
+        if (empty($this->table)) {
+            throw new \RuntimeException('You must set the database table to be used with your query.');
+        }
+
+        $builder = $this->builder();
+        if ($limit) {
+            $builder->limit($limit, $offset);
+        }
+
+        $result = $builder->get()->getResult();
+        // No limpiamos el builder aquí para mantener el estado si se encadena
         return $result;
     }
-    
-    public function genericInsert($db, $valores){
-        $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
-        
-        $conectDB->table($this->tabla)->insert($valores);
-        $insert_id = $conectDB->insertID();
-        return ($insert_id != 0) ? $insert_id : 'error';
+
+    public function update($id = null, $data = null): bool
+    {
+        if (empty($this->table)) {
+            throw new \RuntimeException('You must set the database table to be used with your query.');
+        }
+
+        if (empty($data)) {
+            throw new \RuntimeException('No data provided for update.');
+        }
+
+        $builder = $this->db->table($this->table); // Usamos una nueva instancia del Query Builder
+
+        if ($id !== null) {
+            $builder->where($this->primaryKey, $id);
+        } else {
+            throw new \RuntimeException('An ID or WHERE condition is required for update.');
+        }
+
+        return $builder->update($data);
     }
-    
-    public function genericUpdate($db, $valores){
+
+    public function insert($data = null, bool $returnID = true)
+    {
+        if (empty($this->table)) {
+            throw new \RuntimeException('You must set the database table to be used with your query.');
+        }
+
+        if (empty($data)) {
+            throw new \RuntimeException('No data provided for insert.');
+        }
+
+        return parent::insert($data, $returnID);
+    }
+
+    public function genericSelect($db = '')
+    {
         $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
-        
-        $conectDB->table($this->tabla)->where($this->condicion[0], $this->condicion[1])->update($valores);
+
+        if (empty($this->table)) {
+            throw new \RuntimeException('You must set the database table to be used with your query.');
+        }
+
+        $builder = $conectDB->table($this->table);
+        return $builder->get()->getResult();
+    }
+
+    public function genericInsert($db, $valores)
+    {
+        $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
+        $conectDB->table($this->table)->insert($valores);
+        $insertId = $conectDB->insertID();
+        return ($insertId != 0) ? $insertId : 'error';
+    }
+
+    public function genericUpdate($db, $valores)
+    {
+        $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
+        $builder = $conectDB->table($this->table);
+
+        if (empty($this->condicion)) {
+            throw new \RuntimeException('A WHERE condition is required for genericUpdate.');
+        }
+
+        $builder->where($this->condicion)->update($valores);
         return $conectDB->affectedRows();
     }
-    
-    public function genericDelete($db, $valores){
+
+    public function genericDelete($db, $valores)
+    {
         $conectDB = ($db === '') ? $this->db : \Config\Database::connect($db);
-        
-        $conectDB->table($this->tabla)->where($valores)->delete();
+        $conectDB->table($this->table)->where($valores)->delete();
         return $conectDB->affectedRows();
     }
-    
-    public function loadFile($f, $n, $d, $post, $config) {
+
+    public function loadFile($f, $n, $d, $post, $config)
+    {
         $file = $this->request->getFile($f);
-        if ($file->isValid() && !$file->hasMoved()) {
+        if ($file && $file->isValid() && !$file->hasMoved()) {
             $sel = $post[$f . '_select'] ?? '';
             $newName = $post["userRFC"] . "-" . $n . $sel;
             $file->move($config['upload_path'], $newName);
-    
+
             $valores = [
                 'id_lead' => session('id_lead'),
                 'archivo_nombre' => $file->getName(),
@@ -85,26 +169,15 @@ class basicModel extends Model {
                 'archivo_ruta' => 'assets/documentos/',
                 'archivo_status' => 'cargado'
             ];
-    
-            $this->clean();
-            $this->tabla = 'archivos';
-            $insertProceso = $this->genericInsert('', $valores);
-            return $insertProceso !== 'error';
+
+            $this->table('archivos');
+            return $this->insert($valores);
         }
         return false;
     }
-    
-    public function clean(){
-        $this->tabla = '';
-        $this->campos = '*';
-        $this->join = [];
-        $this->like = [];
-        $this->condicion = '';
-        $this->o = '';
-        $this->order = '';
-        $this->group = '';
-        $this->dir = '';
-        $this->limit = '';
-        $this->start = '';
+
+    public function getAdminSettings()
+    {
+        return [];
     }
 }

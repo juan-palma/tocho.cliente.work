@@ -1,109 +1,84 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+// app/Helpers/login_helper.php
 
-/**
- * IDA Helper Login
- *
- */
+use CodeIgniter\HTTP\RedirectResponse;
 
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('isLogged'))
-{
-	/**
-	 * Is Logged
-	 *
-	 * Chek if user date is set in session an login ok redirecto tu panel else redirect to login again.
-	 *
-	 * @return	redirect to login or redirecto to panel
-	 */
-	function isLogged(){
-	    if( (isset($_SESSION['userID']) && $_SESSION['userID'] !== '') && (isset($_SESSION['finger']) && $_SESSION['finger'] !== '') ){
-			redirect(base_url('admin/panel'));
-		}
-	}
+if (!function_exists('isLogged')) {
+    /**
+     * Checa si el usuario está logueado y redirige al panel si es así.
+     *
+     * @return RedirectResponse|null
+     */
+    function isLogged()
+    {
+        $session = session();
+        if ($session->has('userID') && !empty($session->get('userID')) && 
+            $session->has('finger') && !empty($session->get('finger'))) {
+            return redirect()->to(base_url('admin/panel'));
+        }
+        return null; // No redirige si no está logueado
+    }
 }
 
-
-if ( ! function_exists('isNoLogged'))
-{
-	/**
-	 * Is Logged
-	 *
-	 * Chek if user date is set in session an login ok redirecto tu panel else redirect to login again.
-	 *
-	 * @return	redirect to login or redirecto to panel
-	 */
-	function isNoLogged(){
-	    if( (!isset($_SESSION['userID']) || $_SESSION['userID'] === '') || (!isset($_SESSION['finger']) || $_SESSION['finger'] === '') ){
-			session_destroy();
-			redirect(base_url('admin/login'));
-		}
-	}
+if (!function_exists('isNoLogged')) {
+    /**
+     * Checa si el usuario no está logueado, destruye la sesión y redirige al login.
+     *
+     * @return RedirectResponse|null
+     */
+    function isNoLogged()
+    {
+        $session = session();
+        if (!$session->has('userID') || empty($session->get('userID')) || 
+            !$session->has('finger') || empty($session->get('finger'))) {
+            $session->destroy();
+            return 'admin/login';
+        }
+        return null; // No redirige si está logueado
+    }
 }
 
-
-
-if ( ! function_exists('isNoLoggedCustom'))
-{
-	/**
-	 * Is Logged
-	 *
-	 * revisa si el usuario que desea enrar a personalizar un uniforme se encuenra logueado
-	 *
-	 * @return	redirect to login or redirecto to panel
-	 */
-	function isNoLoggedCustom(){
-		if( (!isset($_SESSION['idUser']) || $_SESSION['idUser'] === '') ){
-			//session_destroy();
-			return false;
-		} else{
-			return true;
-		}
-	}
-}
-if ( ! function_exists('isLoggedNoDataCustom'))
-{
-	/**
-	 * Is Logged
-	 *
-	 * revisa si el usuario que desea enrar a personalizar un uniforme ha ingresado los datos de equipo y liga para poder continuar con la siguente ventana
-	 *
-	 * @return	redirect to login or redirecto to panel
-	 */
-	function isLoggedNoDataCustom(){
-		if( (!isset($_SESSION['userEquipo']) || $_SESSION['userEquipo'] === '') || (!isset($_SESSION['userLiga']) || $_SESSION['userLiga'] === '') ){
-			return false;
-		} else{
-			return true;
-		}
-	}
+if (!function_exists('isNoLoggedCustom')) {
+    /**
+     * Verifica si el usuario está logueado para personalización.
+     *
+     * @return bool
+     */
+    function isNoLoggedCustom()
+    {
+        $session = session();
+        return $session->has('idUser') && !empty($session->get('idUser'));
+    }
 }
 
-
-
-
-if ( ! function_exists('isNoLoggedProfile'))
-{
-	/**
-	 * Is Logged
-	 *
-	 * Chek if user date is set in session an login ok redirecto tu panel else redirect to login again.
-	 *
-	 * @return	redirect to login or redirecto to panel
-	 */
-	function isNoLoggedProfile(){
-	    if( (!isset($_SESSION['userIDProfile']) || $_SESSION['userIDProfile'] === '') || (!isset($_SESSION['fingerProfile']) || $_SESSION['fingerProfile'] === '') ){
-			session_destroy();
-			redirect(base_url('portafolio/login'));
-		}
-	}
+if (!function_exists('isLoggedNoDataCustom')) {
+    /**
+     * Verifica si el usuario tiene datos de equipo y liga en la sesión.
+     *
+     * @return bool
+     */
+    function isLoggedNoDataCustom()
+    {
+        $session = session();
+        return $session->has('userEquipo') && !empty($session->get('userEquipo')) && 
+               $session->has('userLiga') && !empty($session->get('userLiga'));
+    }
 }
 
-
-
-
-
-
-
-?>
+if (!function_exists('isNoLoggedProfile')) {
+    /**
+     * Checa si el usuario no tiene datos de perfil, destruye la sesión y redirige al login.
+     *
+     * @return RedirectResponse|null
+     */
+    function isNoLoggedProfile()
+    {
+        $session = session();
+        if (!$session->has('userIDProfile') || empty($session->get('userIDProfile')) || 
+            !$session->has('fingerProfile') || empty($session->get('fingerProfile'))) {
+            $session->destroy();
+            return redirect()->to(base_url('portafolio/login'));
+        }
+        return null; // No redirige si tiene datos de perfil
+    }
+}

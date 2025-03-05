@@ -17,41 +17,42 @@ class Ajax extends Controller {
         // Método vacío
     }
     
-    public function footerForm(){
+    public function footerForm()
+    {
         $json = array();
         $json['status'] = 'ok';
         $json['valores'] = array();
-        $json['errores']  = array();
-        
+        $json['errores'] = array();
+
         $encontrar = array("\r\n", "\n", "\r");
         $remplazar = '';
-        
-        //Consulta - GENERAL
-        $this->basic_modal->clean();
-        $this->basic_modal->tabla = 'contenido';
-        $this->basic_modal->campos = 'contenido_info';
-        $this->basic_modal->condicion = array( "contenido_pagina" => 'general' );
-        
-        $respuesta = $this->basic_modal->genericSelect('sistema');
+
+        // Consulta - GENERAL
+        $respuesta = $this->basic_modal->clean()
+            ->table('contenido')
+            ->select('contenido_info')
+            ->where(['contenido_pagina' => 'general'])
+            ->genericSelect('sistema');
+
         $consulta = (is_array($respuesta) && count($respuesta) > 0) ? $respuesta[0] : '';
         $clean = (isset($consulta) && property_exists($consulta, 'contenido_info')) ? str_replace($encontrar, $remplazar, $consulta->contenido_info) : '';
-        $cleanObjecDB = ( is_object(json_decode($clean)) ) ? json_decode($clean) : new \stdClass();
-        
-        require(APPPATH.'Views/admin/customers_parametros.php');
-        
+        $cleanObjecDB = (is_object(json_decode($clean))) ? json_decode($clean) : new \stdClass();
+
+        require(APPPATH . 'Views/admin/customers_parametros.php');
+
         $idaMail_data['destino_mail'][] = $cleanObjecDB->correo;
         $idaMail_data['origen_mail'] = $cleanObjecDB->correo_form;
         $idaMail_data['reply_mail'] = $cleanObjecDB->correo;
         $idaMail_data['username'] = $cleanObjecDB->correo_form;
         $idaMail_data['password'] = $cleanObjecDB->correo_pass;
-        
+
         $idaMail_data['destino_mail'][] = "soporte@idalibre.com";
         $idaMail_data['origen_mail'] = "soporte@idalibre.com";
         $idaMail_data['reply_mail'] = "soporte@idalibre.com";
         $idaMail_data['username'] = "soporte@idalibre.com";
         $idaMail_data['password'] = 'Soporte.libre';
-        
-        $template = FCPATH.'assets/public/template/contactoForm.php';
+
+        $template = FCPATH . 'assets/public/template/contactoForm.php';
         $info = array();
         $info['nombre'] = $this->request->getPost('nombre');
         $info['mail'] = $this->request->getPost('correo');
@@ -61,20 +62,20 @@ class Ajax extends Controller {
         $info['logo'] = base_url('assets/public/img/logo_ci@2x.png');
         $info['empresa'] = 'Circulo Imagen';
         $info['sitio'] = base_url();
-        
-        if($this->request->getPost('nombre') !== '' && $this->request->getPost('correo') !== '' && $this->request->getPost('telefono')){
+
+        if ($this->request->getPost('nombre') !== '' && $this->request->getPost('correo') !== '' && $this->request->getPost('telefono')) {
             $respMail = ida_sendMail($template, $info, $idaMail_data);
-            if($respMail){
+            if ($respMail) {
                 $json['valores'][] = 'Se envió el correo de manera correcta.';
-            } else{
+            } else {
                 $json['status'] = 'error';
-                $json['errores'][]  = 'Error interno al enviar el correo';
+                $json['errores'][] = 'Error interno al enviar el correo';
             }
-        } else{
+        } else {
             $json['status'] = 'error';
-            $json['errores'][]  = 'Es necesario que todos los campos tengan un valor.';
+            $json['errores'][] = 'Es necesario que todos los campos tengan un valor.';
         }
-        
+
         echo json_encode($json);
     }
     

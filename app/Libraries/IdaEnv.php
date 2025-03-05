@@ -5,7 +5,7 @@ namespace App\Libraries;
 use Aws\Kms\KmsClient;
 use Aws\Exception\AwsException;
 
-class Ida_env {
+class IdaEnv {
     
     protected $aliasKey;
 

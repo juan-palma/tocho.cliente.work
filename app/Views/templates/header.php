@@ -323,35 +323,16 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 			
 			<div id="logo"><a href="<?php echo(base_url()); ?>"><img src="<?php echo(base_url('assets/public/img/tocho-logo.svg')); ?>"></img></a></div>
 
-			<div id="menus">
+			<!--<div id="menus">
 				<a id="btnMenuHome" href="<?php echo(base_url()); ?>"><div class="menu">Home</div></a>
 				<a href="<?php echo(base_url('servicios')); ?>"><div class="menu">servicios</div></a>
 				<a href="<?php echo(base_url('portafolio')); ?>"><div class="menu">portafolio</div></a>
 				<a id="btnMenuCliente" href="javascript:void(0);"><div class="menu">clientes</div></a>
 				<a href="<?php echo(base_url('quienes_somos')); ?>"><div class="menu">quiénes somos</div></a>
 				<a href="<?php echo(base_url('postulate')); ?>"><div class="menu">postúlate</div></a>
-			</div>
+			</div>-->
 
 			<div id="dir">
-
-				<div class="tel"><a href="tel:<?php echo($generalDB->telefono); ?>">Tel:<?php echo($generalDB->telefono); ?></a></div>
-				<div class="mail"><a href="mailto:<?php echo($generalDB->correo); ?>"><?php echo($generalDB->correo); ?></a></div>
-
-				<div class="redes">
-					<?php
-						foreach ($headerDB->redes as $i=>$v) {
-							if($v->liga !== ''){
-						?>
-							<div class="red <?php echo($v->red); ?>">
-								<a target="_blank" href="<?php echo($v->liga); ?>">
-									<?php echo( $v->icono); ?>
-								</a>
-							</div>
-						<?php
-							}
-						}
-					?>
-				</div>
 			
 				<div class="redes">
 					<div class="red carrito">
@@ -399,7 +380,7 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 						</a>
 					</div>
 					
-					<div class="red menu_btn">
+					<!--<div class="red menu_btn">
 						<a target="_self" href="javascript:void(0);">
 							<svg version="1.1" id="Menu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 								 viewBox="0 0 302.9 222.7" style="enable-background:new 0 0 302.9 222.7;" xml:space="preserve">
@@ -410,9 +391,28 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 							</g>
 							</svg>
 						</a>
-					</div>
+					</div>-->
 					
 				</div>
+
+				<!--<div class="tel"><a href="tel:<?php echo($generalDB->telefono); ?>">Tel:<?php echo($generalDB->telefono); ?></a></div>
+				<div class="mail"><a href="mailto:<?php echo($generalDB->correo); ?>"><?php echo($generalDB->correo); ?></a></div>-->
+
+				<!--<div class="redes">
+					<?php
+						foreach ($headerDB->redes as $i=>$v) {
+							if($v->liga !== ''){
+						?>
+							<div class="red <?php echo($v->red); ?>">
+								<a target="_blank" href="<?php echo($v->liga); ?>">
+									<?php echo( $v->icono); ?>
+								</a>
+							</div>
+						<?php
+							}
+						}
+					?>
+				</div>-->
 				
 				
 
@@ -423,7 +423,7 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 		
 
 		<nav id="navMobile" class="onlyMobile">
-			<div id="logo"><a href="<?php echo(base_url()); ?>"><img src="<?php echo(base_url('assets/public/img/logo_ci_fondo.svg')); ?>"></img></a></div>
+			<div id="logo"><a href="<?php echo(base_url()); ?>"><img src="<?php echo(base_url('assets/public/img/tocho-logo.svg')); ?>"></img></a></div>
 			<div id="navMobileOpen">
 				<img src="<?php echo(base_url('assets/public/img/navMobileOpenBtn.svg')); ?>" />
 			</div>

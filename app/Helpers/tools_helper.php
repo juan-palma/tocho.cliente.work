@@ -1,248 +1,148 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+// app/Helpers/tools_helper.php
 
-/**
- * IDA Helper Custom
- *
- */
+use CodeIgniter\HTTP\RedirectResponse;
 
+if (!function_exists('uuid')) {
+    /**
+     * Genera una cadena de valor único irrepetible (UUID).
+     *
+     * @return string
+     */
+    function uuid()
+    {
+        if (function_exists('com_create_guid')) {
+            return com_create_guid();
+        }
 
+        mt_srand((double)microtime() * 10000); // Semilla para compatibilidad con versiones antiguas
+        $charid = strtoupper(md5(uniqid(rand(), true)));
+        $hyphen = chr(45); // "-"
+        $uuid = substr($charid, 0, 8) . $hyphen
+              . substr($charid, 8, 4) . $hyphen
+              . substr($charid, 12, 4) . $hyphen
+              . substr($charid, 16, 4) . $hyphen
+              . substr($charid, 20, 12);
 
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('uuid'))
-{
-	/**
-	 * UUID
-	 *
-	 * Generar Cadena de valor Unico Irrepetibles.
-	 *
-	 * @return	mixed  string
-	 */
-	function uuid(){
-	    if (function_exists('com_create_guid')){
-	        return com_create_guid();
-	    }else{
-	        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
-	        $charid = strtoupper(md5(uniqid(rand(), true)));
-	        $hyphen = chr(45);// "-"
-	        $uuid = ''//chr(123)// "{"
-	            .substr($charid, 0, 8).$hyphen
-	            .substr($charid, 8, 4).$hyphen
-	            .substr($charid,12, 4).$hyphen
-	            .substr($charid,16, 4).$hyphen
-	            .substr($charid,20,12);
-	            //.chr(125);// "}"
-	        return $uuid;
-	    }
-	}
+        return $uuid;
+    }
 }
 
+if (!function_exists('readCSV')) {
+    /**
+     * Lee un archivo CSV y devuelve estadísticas y datos.
+     *
+     * @param string $filePath Ruta al archivo CSV
+     * @param array  $opt      Opciones (expMatch, breakCaracter)
+     * @return object
+     */
+    function readCSV($filePath, $opt = [])
+    {
+        $expMatch = $opt['expMatch'] ?? '/[\w\d]/';
+        $breakCaracter = $opt['breakCaracter'] ?? "\t";
 
+        $obj = new stdClass();
+        $obj->errorObj = [];
 
-// ------------------------------------------------------------------------
+        $row = 0;
+        $numAllData = 0;
+        $machData = [];
+        $numMachData = 0;
+        $titulosReg = [];
+        $numNoMachData = 0;
+        $noMachData = [];
 
-if ( ! function_exists('readCSV'))
-{
-	/**
-	 * Count CSV
-	 *
-	 * Abre el archvio del servidor y lo recorre para contar la cantidad de registros.
-	 *
-	 * @return	number
-	 */
-	function readCSV($filePath, $opt = []){
-	    $expMatch = (($opt['expMatch'] && $opt['expMatch'] !== '')) ?  $opt['expMatch'] : "/[\w\d]/"  ;
-	    $breakCaracter = (($opt['breakCaracter'] && $opt['breakCaracter'] !== '')) ?  $opt['breakCaracter'] : "\t"  ;
-	    
-	    $obj = (object)[];
-	    $errorObj = [];
-	    
-		$row = 0;
-		$numAllData = 0;
-		$machData = [];
-		$numMachData = 0;
-		$titulosReg = [];
-		
-		$numNoMachData = 0;
-		$noMachData = [];
-		
-		$noMatchDate = [];
-		
-		if($handle = @fopen($filePath, "r")){ 
-			while (($data = fgetcsv($handle, 0)) !== FALSE) { 
-				if(count($data) <= 1){
-					$campos = explode($breakCaracter, $data[0]);
-				} else{
-					$campos = $data;
-				}
+        if ($handle = @fopen($filePath, 'r')) {
+            while (($data = fgetcsv($handle, 0)) !== false) {
+                $campos = (count($data) <= 1) ? explode($breakCaracter, $data[0]) : $data;
 
-				if($row == 0){
-					foreach($campos as $i => $c){
-						$titulosReg[] = $c;
-					}
-					unset($i, $c);
-					
-				} else{
-					$numAllData++;
-					if(preg_match($expMatch, $data[0])){
-						$numMachData++;
-						$machData[] = $campos;
-					
-/*
-						foreach($campos as $i => $c){
-							if($i == $laPosicion){ $elNombre = $c; }
-							if( filter_var($c, FILTER_VALIDATE_EMAIL) ){ $elMail = $c; }
-							if(preg_match('/^([A-Z,Ñ,&]{3,4}([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])[A-Z|\d]{3})$/', $c)){ $elRFC = $c; } 
-							
-							if($i > 0) { $insetValue .= ", "; }
-							$insetValue .= "'".$c."'";
-						}
-						unset($i, $c);
-*/
-					} else{
-						$numNoMachData++;
-						$noMachData[] = $campos;
-						$errorObj[] = "En la linea " . $row . " existen caracteres no validos permitidos en la sentencia, amplie los caracteres permitidos en su opcion expMatch o verifique los caracteres de su archivo";
-					}
-				}
-				
-				$row++;
-			}
-			fclose($handle);
-		} else{
-			$errorObj[] = "No se pudo abrir el archivo CSV por lotes, compruebe el nombre del archivo y que se encuentre en la ruta correcta.";
-		};
-	    
-	    
-	    //Regresar la resputa de la lectura del csv al usuario.
-	    $obj->numReg = $numAllData;
-	    $obj->matchReg = $machData;
-	    $obj->numMatchReg = $numMachData;
-	    $obj->noMatchReg = $noMachData;
-	    $obj->numNoMatchReg = $numNoMachData;
-	    $obj->titulosReg = $titulosReg;
-	    	    
-	    $obj->errorObj = $errorObj;
-	    
-	    return $obj;
-	    
-	}
+                if ($row == 0) {
+                    $titulosReg = $campos;
+                } else {
+                    $numAllData++;
+                    if (preg_match($expMatch, $data[0])) {
+                        $numMachData++;
+                        $machData[] = $campos;
+                    } else {
+                        $numNoMachData++;
+                        $noMachData[] = $campos;
+                        $obj->errorObj[] = "En la línea $row existen caracteres no válidos según expMatch.";
+                    }
+                }
+                $row++;
+            }
+            fclose($handle);
+        } else {
+            $obj->errorObj[] = "No se pudo abrir el archivo CSV: $filePath.";
+        }
+
+        $obj->numReg = $numAllData;
+        $obj->matchReg = $machData;
+        $obj->numMatchReg = $numMachData;
+        $obj->noMatchReg = $noMachData;
+        $obj->numNoMatchReg = $numNoMachData;
+        $obj->titulosReg = $titulosReg;
+
+        return $obj;
+    }
 }
 
+if (!function_exists('popFlash')) {
+    /**
+     * Genera un mensaje emergente con datos flash de sesión (SweetAlert).
+     *
+     * @param string $tipo  Tipo de mensaje (success, error)
+     * @param array  $flash Datos flash
+     * @return string       Código JS para mostrar el mensaje
+     */
+    function popFlash($tipo, $flash)
+    {
+        $linea = implode(' ', $flash);
+        $titulo = ($tipo === 'success') ? 'Good job!' : 'UPS...!';
+        $class = ($tipo === 'success') ? 'success' : 'warning';
 
-
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('popFlash'));
-{
-	/**
-	 * PopUp Flash Sesion data Menssage
-	 *
-	 * Abre una ventana con informacion en una variable de sesion tipo Flashdata.
-	 *
-	 * @return	html and js
-	 */
-	function popFlash($tipo, $flash){
-		$linea = '';
-		$titulo = '';
-		$class = '';
-		
-		foreach($flash as $s){
-			$linea .= $s . ' ';
-		}
-		
-		switch($tipo){
-			case 'success':
-				$titulo = "Good job!";
-				$class = "success";
-			break;
-			
-			case 'error':
-				$titulo = "UPS...!";
-				$class = "warning";
-			break;
-		}
-		
-		?>
-		<script type="text/javascript">
-			console.info('<?php echo($linea); ?>');
-			swal('<?php echo($titulo); ?>', '<?php echo($linea); ?>', '<?php echo($class); ?>');
-		</script>
-		<?php
-
-	}
+        return "<script type='text/javascript'>
+            console.info('" . esc($linea) . "');
+            swal('" . esc($titulo) . "', '" . esc($linea) . "', '" . esc($class) . "');
+        </script>";
+    }
 }
 
-
-
-
-
-
-
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('vcard'))
-{
-	/**
-	 * vCard
-	 *
-	 * Genera un arcvhio de contacto descargable
-	 *
-	 * @return	mixed  string
-	 */
-	function vcard(){
-	    return utf8_encode('BEGIN:VCARD
-							N:Inmotion
-							TEL:(55) 5393 8627
-							EMAIL:info@inmotion.com.mx
-							URL:https://inmotion.com.mx
-							ADR:Monte Elbruz 132, Lomas de Chapultepec Miguel Hidalgo, CDMX, México
-							ORG:Inmotion Communications
-							NOTE:
-							VERSION:3.0
-							END:VCARD'
-		);
-	}
+if (!function_exists('vcard')) {
+    /**
+     * Genera un archivo vCard como texto.
+     *
+     * @return string
+     */
+    function vcard()
+    {
+        return utf8_encode("BEGIN:VCARD
+            N:Inmotion
+            TEL:(55) 5393 8627
+            EMAIL:info@inmotion.com.mx
+            URL:https://inmotion.com.mx
+            ADR:Monte Elbruz 132, Lomas de Chapultepec Miguel Hidalgo, CDMX, México
+            ORG:Inmotion Communications
+            NOTE:
+            VERSION:3.0
+            END:VCARD");
+    }
 }
 
-
-
-
-
-if ( ! function_exists('idaConvertText'))
-{
-	/**
-	 * Strings
-	 *
-	 * Convierte caracteres en mayusculas, minusculas, tipo titulo, primrea letra a mayuscula y mas funciones para procesar un string
-	 *
-	 * @return	string
-	 */
-	function idaConvertText($modo, $text){
-		if($modo === 'primera_mayuscula'){
-			preg_match('/^\w{1}/', $text, $match);
-			return preg_replace('/^\w{1}/', mb_convert_case($match[0], MB_CASE_UPPER, "UTF-8"), $text);
-		}
-	}
-	
+if (!function_exists('idaConvertText')) {
+    /**
+     * Convierte texto según el modo especificado.
+     *
+     * @param string $modo Modo de conversión (ej. 'primera_mayuscula')
+     * @param string $text Texto a convertir
+     * @return string
+     */
+    function idaConvertText($modo, $text)
+    {
+        if ($modo === 'primera_mayuscula') {
+            preg_match('/^\w{1}/u', $text, $match);
+            return preg_replace('/^\w{1}/u', mb_convert_case($match[0], MB_CASE_UPPER, 'UTF-8'), $text);
+        }
+        return $text; // Devolver texto sin cambios si el modo no coincide
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>

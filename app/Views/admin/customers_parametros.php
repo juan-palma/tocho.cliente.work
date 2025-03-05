@@ -9,7 +9,7 @@
 	
 	$idaMail_data['bcc'] = array();
 	$idaMail_data['bcc'][] = 'soporte@idalibre.com';
-	$idaMail_data['bcc'][] = 'monserrat@radicaltesta.com';
+	//$idaMail_data['bcc'][] = '';
 	
 	$idaMail_data['origen_nombre'] = 'Contacto - Circulo de Imagen';
 	$idaMail_data['origen_mail'] = 'informes@idalibre.com';
@@ -21,9 +21,9 @@
 	$idaMail_data['priority'] = 3;
 	$idaMail_data['encoding'] = 'quoted-printable';
 	
-	$idaMail_data['host'] = 'ci.com.mx';
+	$idaMail_data['host'] = 'idalibre.com';
 	$idaMail_data['port'] = 465;
-	$idaMail_data['username'] = 'contacto@ci.com.mx';
+	$idaMail_data['username'] = 'contacto@idalibre.com';
 	$idaMail_data['password'] = 'Nm2019';
 		
 	
