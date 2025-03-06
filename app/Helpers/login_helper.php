@@ -32,7 +32,7 @@ if (!function_exists('isNoLogged')) {
         if (!$session->has('userID') || empty($session->get('userID')) || 
             !$session->has('finger') || empty($session->get('finger'))) {
             $session->destroy();
-            return 'admin/login';
+            return 'login';
         }
         return null; // No redirige si está logueado
     }

@@ -61,14 +61,15 @@
                     <ul class="nav">
                         <?php foreach ($modulos ?? [] as $m): ?>
                             <?php
-                            $colaps = !empty($m['permiso_sub']);
-                            $sub = $colaps ? explode(':', $m['permiso_sub']) : [];
-                            $label = $customModuleIcon[$m['permiso_modulo']]->label ?? str_replace('_', ' ', $m['permiso_modulo']);
-                            $icono = $customModuleIcon[$m['permiso_modulo']]->icono ?? 'nc-icon nc-grid-45';
+                                $colaps = !empty($m['permiso_sub']);
+                                $sub = $colaps ? explode(':', $m['permiso_sub']) : [];
+                                $label = $customModuleIcon[$m['permiso_modulo']]->label ?? str_replace('_', ' ', $m['permiso_modulo']);
+                                $icono = $customModuleIcon[$m['permiso_modulo']]->icono ?? 'nc-icon nc-grid-45';
+                                $urlP = $customModuleIcon[$m['permiso_modulo']]->url ?? $m['permiso_modulo'];
                             ?>
                             <?php if (!$colaps): ?>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="<?= esc(base_url('admin/' . $m['permiso_modulo'])) ?>">
+                                    <a class="nav-link" href="<?= esc(base_url('admin/' . $urlP)) ?>">
                                         <i class="<?= esc($icono) ?>"></i>
                                         <p><?= esc($label) ?></p>
                                     </a>

@@ -1,208 +1,196 @@
 <?php
-
 namespace App\Controllers\Admin;
 
-use CodeIgniter\Controller;
-use stdClass;
+use App\Controllers\BaseController;
+use App\Traits\PanelTrait;
+use App\Models\BasicModel;
 
-class HombresSudadera extends Controller {
-    public function __construct(){
-        helper(['url', 'form']);
-        $this->session = session();
-        $this->upload = \Config\Services::upload();
-    }
-    
+class HombresSudadera extends BaseController
+{
+    use PanelTrait;
+
     public $mainPage = 'hombres_sudadera';
     public $mainPageName = 'Hombres_sudadera';
-    public $nombrePrenda = "sudadera";
-    public $sexo = "hombres";
-    
-    public $seccionesInternas = ['base', 'color', 'estampados','lateral_color', 'lateral_estampados','espalda_color', 'espalda_estampados'];
-    
-    public $varFlash = 'flashCultura';
-    public $success = [];
-    public $error = [];
-    
+    public $nombrePrenda = 'sudadera';
+    public $sexo = 'hombres';
+    public $seccionesInternas = ['base', 'color', 'estampados', 'lateral_color', 'lateral_estampados', 'espalda_color', 'espalda_estampados'];
     public $status = [];
     public $valores = [];
     public $errores = [];
-    
-    public function index(){
-        if (!isLoggedIn()) {
-            return redirect()->to(base_url('login'));
-        }
-        
-        $encontrar = array("\r\n", "\n", "\r");
-        $remplazar = '';        
-        
-        // Recorrido carga de datos
-        $modulosRecorrido = $this->seccionesInternas;
-        foreach($modulosRecorrido as $s){
-            $this->basic_modal->clean();
-            $this->basic_modal->tabla = 'contenido';
-            $this->basic_modal->campos = 'contenido_info';
-            $this->basic_modal->condicion = array( "contenido_pagina" => $this->mainPage, "contenido_seccion" => $s );
-            
-            $respuesta = $this->basic_modal->genericSelect('sistema');
-            $consulta = (is_array($respuesta) && count($respuesta) > 0) ? $respuesta[0] : '';
-            $clean = (isset($consulta) && property_exists($consulta, 'contenido_info')) ? str_replace($encontrar, $remplazar, $consulta->contenido_info) : '';
-            $cleanDB = ( is_object(json_decode($clean)) ) ? json_decode($clean) : new stdClass();
-            $data[$s.'DB'] = $cleanDB;
-        }        
-        
-        $data['titulo'] = $this->mainPageName;
-        $data['actual'] = $this->mainPage;
-        $data['varFlash'] = $this->varFlash;
-        $data['nombrePrenda'] = $this->nombrePrenda;
-        $data['sexo'] = $this->sexo;
-        echo view('admin/head2', $data);
-        echo view('admin/saveControl', $data);
-        echo view('admin/'.$this->mainPage, $data);
-        echo view('admin/footer2', $data);
+
+    public function __construct()
+    {
+        $this->initPanel();
     }
-    
-    private function loadFilesAuto($c, $m, $s, $n){
-        $folder = ( isset($c['folder']) && $c['folder'] !== "" ) ? $c['folder'] : "";
-        $config['upload_path'] = FCPATH.'assets/public/img' . $folder;
-        $config['allowed_types'] = ( isset($c['type']) && $c['type'] !== "" ) ? $c['type'] : 'gif|jpg|jpeg|png|svg|svg+xml';
-        $config['max_size'] = ( isset($c['max']) && $c['max'] !== "" ) ? $c['max'] : 1024;
-        $config['overwrite'] = ( isset($c['overwrite']) && $c['overwrite'] == "true" ) ? true : false;
-        
-        $this->upload->initialize($config);
-        
+
+    public function index()
+    {
+        if ($redir = isNoLogged()) {
+            return redirect()->to(base_url($redir));
+        }
+
+        $moduleName = $this->getModuleName();
+        $data = $this->getPanelData($moduleName);
+
+        $dataComp = array_map(fn($section) => [$section . 'DB' => $this->getSectionData($this->mainPage, $section)], $this->seccionesInternas);
+        $dataComp = array_merge(...$dataComp);
+
+        $fusionado = array_merge($data, $dataComp, [
+            'nombrePrenda' => $this->nombrePrenda,
+            'sexo' => $this->sexo
+        ]);
+
+        return $this->renderPanelView('admin/' . $this->mainPage, $fusionado);
+    }
+
+    private function getSectionData($page, $section)
+    {
+        $model = new BasicModel();
+        $result = $model->table('contenido')
+            ->select('contenido_info')
+            ->where(['contenido_pagina' => $page, 'contenido_seccion' => $section])
+            ->findAll();
+
+        $content = !empty($result) ? str_replace(["\r\n", "\n", "\r"], '', $result[0]->contenido_info) : '';
+        return json_decode($content) ?: new \stdClass();
+    }
+
+    public function do_upload()
+    {
+        $this->status = 'ok';
+        $pageMain = $this->request->getPost('pagina');
+        $this->valores['sectores'] = count($this->request->getPost('sectores') ?? []);
+
+        foreach ($this->request->getPost('sectores') ?? [] as $sector) {
+            $this->valores[$sector['baseName']] = [];
+            $obj = isset($sector['txts']) ? (object) $sector['txts'] : new \stdClass();
+            if (isset($obj->url)) {
+                $obj->url = url_title($obj->url);
+            }
+
+            $obj->imgs = (object)[];
+            if (isset($sector['imgIndex'])) {
+                $imgIndex_value = explode(',', $sector['imgIndex']);
+                foreach ($imgIndex_value as $imgIndex) {
+                    $carga = $this->loadFilesAuto($sector['imgs'][trim($imgIndex)] ?? [], $pageMain, $sector['baseName'], trim($imgIndex));
+                    $obj->imgs->{trim($imgIndex)} = $carga;
+                }
+            }
+
+            $query = json_encode($obj);
+            $model = new BasicModel();
+            $exists = $model->table('contenido')
+                ->select('id_contenido')
+                ->where(['contenido_pagina' => $pageMain, 'contenido_seccion' => $sector['baseName']])
+                ->findAll();
+
+            $model->table('contenido');
+            if (!empty($exists)) {
+                $model->update($exists[0]->id_contenido, ['contenido_info' => $query]);
+            } else {
+                $model->insert([
+                    'contenido_info' => $query,
+                    'contenido_pagina' => $pageMain,
+                    'contenido_seccion' => $sector['baseName'],
+                    'contenido_user' => $this->request->getPost('userID') ?? ''
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => $this->status,
+            'valores' => $this->valores,
+            'errores' => $this->errores
+        ]);
+    }
+
+    private function loadFilesAuto($c, $m, $s, $n)
+    {
+        $folder = $c['folder'] ?? '';
+        $config = [
+            'upload_path' => FCPATH . 'assets/public/img' . $folder,
+            'allowed_types' => $c['type'] ?? 'gif|jpg|jpeg|png|svg|svg+xml',
+            'max_size' => $c['max'] ?? 1024,
+            'overwrite' => ($c['overwrite'] ?? 'false') === 'true'
+        ];
+
         $todasCargaron = true;
         $rutaImagenes = [];
         $this->valores[$s][$n] = [];
-        $f = 'sectores_'.$s.'_imgs_'.$n;
-        
-        if(isset($c['clone'])){
-            //Funciones para recorrer los clones de la seccion
-            foreach($c['clone'] as $i=>$cim){
-                $fc = $f.'_clone'.$i;
-                
-                if( !isset($c['clone'][$i]['name']) ){
-                    if(isset($_FILES[$fc])){
-                        if($_FILES[$fc]['name'] !== "" && $_FILES[$fc]['error'] == 0){
-                            if ( ! $this->upload->do_upload($fc) ){
-                                $todasCargaron = false;
-                                $this->status = 'error';
-                                $this->errores[] =  $this->upload->display_errors();
-                                $rutaImagenes[$i] = '';
-                                $this->valores[$s]['imgs'][$n][$i] = '';
-                            } else{
-                                $result = $this->upload->data();
-                                $rutaImagenes[$i] = $result['file_name'];
-                                $this->valores[$s]['imgs'][$n][$i] = $result['file_name'];
-                                $this->valores[$s][$n][$i] = $result['file_name'];
-                            }
-                        }
-                    }
-                } else{
-                    $rutaImagenes[$i] = $c['clone'][$i]['name'];
-                    $this->valores[$s]['imgs'][$n][$i] = $c['clone'][$i]['name'];
-                }
-            }
-        } else{
-            if( !isset($c['name']) ){
-                if(isset($_FILES[$f])){
-                    if($_FILES[$f]['name'] !== "" && $_FILES[$f]['error'] == 0){
-                        if ( ! $this->upload->do_upload($f) ){
+        $f = "sectores_{$s}_imgs_{$n}";
+
+        if (isset($c['clone'])) {
+            foreach ($c['clone'] as $i => $cim) {
+                $fc = "{$f}_clone{$i}";
+                $file = $this->request->getFile($fc);
+
+                if (!isset($cim['name'])) {
+                    if ($file && $file->isValid() && !$file->hasMoved()) {
+                        $allowedTypes = explode('|', $config['allowed_types']);
+                        $maxSize = $config['max_size'] * 1024;
+
+                        if (!in_array($file->getExtension(), $allowedTypes)) {
                             $todasCargaron = false;
                             $this->status = 'error';
-                            $this->errores[] =  $this->upload->display_errors();
-                            $rutaImagenes = '';
-                            $this->valores[$s]['imgs'][$n] = '';
-                        } else{
-                            $result = $this->upload->data();
-                            $rutaImagenes = $result['file_name'];
-                            $this->valores[$s]['imgs'][$n] = $result['file_name'];
-                            $this->valores[$s][$n][] = $result['file_name'];
+                            $this->errores[] = "El tipo de archivo '{$file->getName()}' no está permitido.";
+                            $rutaImagenes[$i] = '';
+                            $this->valores[$s]['imgs'][$n][$i] = '';
+                        } elseif ($file->getSize() > $maxSize) {
+                            $todasCargaron = false;
+                            $this->status = 'error';
+                            $this->errores[] = "El archivo '{$file->getName()}' excede el tamaño máximo.";
+                            $rutaImagenes[$i] = '';
+                            $this->valores[$s]['imgs'][$n][$i] = '';
+                        } else {
+                            $file->move($config['upload_path'], $file->getName(), $config['overwrite']);
+                            $rutaImagenes[$i] = $file->getName();
+                            $this->valores[$s]['imgs'][$n][$i] = $file->getName();
+                            $this->valores[$s][$n][$i] = $file->getName();
                         }
                     }
+                } else {
+                    $rutaImagenes[$i] = $cim['name'];
+                    $this->valores[$s]['imgs'][$n][$i] = $cim['name'];
                 }
-            } else{
+            }
+        } else {
+            $file = $this->request->getFile($f);
+            if (!isset($c['name'])) {
+                if ($file && $file->isValid() && !$file->hasMoved()) {
+                    $allowedTypes = explode('|', $config['allowed_types']);
+                    $maxSize = $config['max_size'] * 1024;
+
+                    if (!in_array($file->getExtension(), $allowedTypes)) {
+                        $todasCargaron = false;
+                        $this->status = 'error';
+                        $this->errores[] = "El tipo de archivo '{$file->getName()}' no está permitido.";
+                        $rutaImagenes = '';
+                        $this->valores[$s]['imgs'][$n] = '';
+                    } elseif ($file->getSize() > $maxSize) {
+                        $todasCargaron = false;
+                        $this->status = 'error';
+                        $this->errores[] = "El archivo '{$file->getName()}' excede el tamaño máximo.";
+                        $rutaImagenes = '';
+                        $this->valores[$s]['imgs'][$n] = '';
+                    } else {
+                        $file->move($config['upload_path'], $file->getName(), $config['overwrite']);
+                        $rutaImagenes = $file->getName();
+                        $this->valores[$s]['imgs'][$n] = $file->getName();
+                        $this->valores[$s][$n][] = $file->getName();
+                    }
+                }
+            } else {
                 $rutaImagenes = $c['name'];
                 $this->valores[$s]['imgs'][$n] = $c['name'];
             }
         }
-        
-        if($todasCargaron === true){
-            return $rutaImagenes;
-        } else{
-            return false;
-        }
+
+        return $todasCargaron ? $rutaImagenes : false;
     }
-    
-    public function do_upload(){
-        $this->status = 'ok';
-        $pageMain = $this->request->getPost('pagina');
-        $this->valores['sectores'] = count($this->request->getPost('sectores'));
-        
-        foreach ($this->request->getPost('sectores') as $sector) {
-            $this->valores[$sector['baseName']] = [];
-            //:::::: Procesar los valores de texto ::::::
-            if(isset($sector['txts'])){
-                $obj = (object) $sector['txts'];
-                if(isset($obj->url)){
-                    $obj->url = url_title($obj->url);
-                }
-            } else{
-                $obj = new stdClass;
-            }
-            
-            $obj->imgs = (object)[];
-            if( isset($sector['imgIndex']) ){
-                $imgIndex_value = explode(",", $sector['imgIndex'] );
-                foreach ($imgIndex_value as $i=>$imgIndex) {
-                    $carga = $this->loadFilesAuto($sector['imgs'][trim($imgIndex)], $pageMain, $sector['baseName'], trim($imgIndex));
-                    $obj->imgs->{trim($imgIndex)} = @$carga;
-                }
-            }
-            
-            $query = json_encode($obj);
-            
-            //consultar si existe un registro con valores para SECCIONES para saber si interta nuevo registro o actualizar el actual.
-            //Consulta - HOME-SECCIONES
-            $this->basic_modal->clean();
-            $this->basic_modal->tabla = 'contenido';
-            $this->basic_modal->campos = 'id_contenido';
-            $this->basic_modal->condicion = array( "contenido_pagina" => $pageMain, "contenido_seccion" => $sector['baseName'] );
-            
-            $existe = $this->basic_modal->genericSelect('sistema');
-            
-            //Insertar los valores en la base de datos
-            //Consulta
-            $this->basic_modal->clean();
-            $this->basic_modal->tabla = 'contenido';
-            
-            if(count($existe) > 0){
-                //Consulta UPDATE servicios
-                $this->basic_modal->condicion = array('id_contenido', $existe[0]->id_contenido);
-                $valores = array('contenido_info' => $query);
-                $update = $this->basic_modal->genericUpdate('sistema', $valores);
-            } else{
-                //Consulta INSERT servicios
-                $valores = array( 'contenido_info' => $query, 'contenido_pagina' => $pageMain, 'contenido_seccion' => $sector['baseName'], 'contenido_user' => $this->request->getPost('userID'));
-                $insert = $this->basic_modal->genericInsert('sistema', $valores);
-            }
-        }
-        
-        //Fin de la operación y retorno de la respuesta JSON a la consulta.
-        echo json_encode(['status' => $this->status, 'valores' => $this->valores, 'errores' => $this->errores]);
-        $this->cleanVar();
-    }
-    
-    private function clean(){
-        $this->session->remove('formData');
-        return redirect()->to(base_url('admin/'.$this->mainPage));
-    }
-    
-    private function cleanVar(){
-        $this->status = [];
-        $this->valores = [];
-        $this->errores = [];
+
+    private function clean()
+    {
+        session()->remove('formData');
+        return redirect()->to(base_url('admin/' . $this->mainPage));
     }
 }
-
-
-

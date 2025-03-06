@@ -16,15 +16,15 @@
 	$idaMail_data['reply_nombre'] = 'Sistema - Circulo de Imagen';
 	$idaMail_data['reply_mail'] = 'informes@idalibre.com';
 	$idaMail_data['organizacion'] = 'Circulo de Imagen';
-	$idaMail_data['asunto'] = 'Nuevo contacto desde sitio WEB Circulo de Imagen';
+	$idaMail_data['asunto'] = 'Nuevo contacto desde sitio tochon';
 	
 	$idaMail_data['priority'] = 3;
 	$idaMail_data['encoding'] = 'quoted-printable';
 	
 	$idaMail_data['host'] = 'idalibre.com';
-	$idaMail_data['port'] = 465;
-	$idaMail_data['username'] = 'contacto@idalibre.com';
-	$idaMail_data['password'] = 'Nm2019';
+	$idaMail_data['port'] = 465;//587
+	$idaMail_data['username'] = 'soporte@idalibre.com';
+	$idaMail_data['password'] = 'gimqat-4worta-sottAq';
 		
 	
 	$idaMail_data['texto_plano'] = '

@@ -31,6 +31,7 @@ trait PanelTrait
         $customModuleIcon = [
             'general' => (object)['label' => 'General', 'icono' => 'fas fa-window-maximize'],
             'home' => (object)['label' => 'Home', 'icono' => 'fa fa-home'],
+            'hombres_sudadera' => (object)['label' => 'Hombre - Sudadera', 'icono' => 'fa fa-home', 'url'=>'hombre/sudadera'],
             'portafolios' => (object)['label' => 'Portafolios', 'icono' => 'fas fa-suitcase'],
             'servicios' => (object)['label' => 'Servicios', 'icono' => 'fas fa-briefcase'],
             'vacantes' => (object)['label' => 'Vacantes', 'icono' => 'fas fa-newspaper']
@@ -40,6 +41,7 @@ trait PanelTrait
             'titulo' => 'Panel - ' . ucfirst($moduleName),
             'actual' => $moduleName,
             'varFlash' => 'flash' . ucfirst($moduleName),
+            'controlador' => strtolower($moduleName),
             'userAvatar' => $this->session->get('userAvatar'),
             'userName' => $this->session->get('nombre') . ' ' . $this->session->get('apaterno'),
             'modulos' => $this->session->get('modulos'),

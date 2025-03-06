@@ -1906,6 +1906,7 @@ body#productos{
 				    padding: 30px 0px;
 				    border-bottom: 1px solid #fff;
 				    font-size: 1.5vw;
+					color: #fff;
 				}
 				#footer.mainbox div#box_footer_sec1 .bl2 #footerBtnEnviar{
 					padding: 46px 0px 0px 0px;
@@ -1960,6 +1961,33 @@ body#productos{
 					color: #cdb417;
 					margin-left: 6px;
 				}
+
+
+
+
+
+
+
+
+
+
+
+
+/*Aviso de privacidad*/
+div#aviso {
+    min-height: 68vh;
+    padding: 22vh;
+}
+
+
+
+
+
+
+
+
+
+
 			
 /*
 		#footer.mainbox .cotizacion{

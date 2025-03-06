@@ -122,7 +122,6 @@ $data_alianza_logo = [
 ];
 
 	$viewData = ['actual' => $actual];
-	view('admin/saveControl', $viewData)
 ?>
 
 

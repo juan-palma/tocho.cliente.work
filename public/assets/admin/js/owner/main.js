@@ -977,7 +977,7 @@ window.addEvent('domready', function(){
 					general_inicio();
 				break;
 				
-				case 'hombres_sudadera':
+				case 'hombressudadera':
 					hombres_sudadera_inicio();
 				break;
 			}

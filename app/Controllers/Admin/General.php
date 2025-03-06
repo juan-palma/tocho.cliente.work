@@ -21,9 +21,12 @@ class General extends BaseController
 
     public function index()
     {
+        if($redir = isNoLogged()) {
+            return redirect()->to(base_url($redir));
+        }
+
         $moduleName = $this->getModuleName();
         $data = $this->getPanelData($moduleName);
-        $data['controlador'] = strtolower($moduleName);
 
         $encontrar = ["\r\n", "\n", "\r"];
         $remplazar = '';
@@ -53,6 +56,10 @@ class General extends BaseController
 
     public function do_upload()
     {
+        if($redir = isNoLogged()) {
+            return redirect()->to(base_url($redir));
+        }
+
         $this->status = 'ok';
 
         $configGeneral = [
