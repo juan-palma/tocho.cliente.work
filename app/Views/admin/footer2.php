@@ -6,7 +6,7 @@
                             <p class="copyright text-center">
                                 © <script>document.write(new Date().getFullYear())</script>
                                 <a href="javascript:void(0);">Todos los derechos reservados</a>: Powered by:
-                                <a href="http://radicaltesta.com" target="_blank">Radical Testa</a>
+                                <a href="http://idalibre.com" target="_blank">ID.A libre</a>
                             </p>
                         </nav>
                     </div>

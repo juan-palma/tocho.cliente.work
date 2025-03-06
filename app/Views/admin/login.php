@@ -12,7 +12,7 @@
                                             <tr>
                                                 <td>
                                                     <div class="boxLogo">
-                                                        <?php $img = (!empty($db->adminLogo)) ? 'assets/admin/img/' . $db->adminLogo : 'assets/admin/img/adminLogoBase.png'; ?>
+                                                        <?php $img = (!empty($db->adminLogo)) ? 'assets/admin/img/' . $db->adminLogo : 'assets/admin/img/adminLogoBase.svg'; ?>
                                                         <img src="<?= base_url($img) ?>" />
                                                     </div>
                                                 </td>
@@ -64,7 +64,7 @@
                                 </div>
 
                                 <p class="_text-center">
-                                    CMS Panel - <?= esc($_SERVER['SERVER_NAME']) ?>
+                                    CMS Panel  <?php //esc($_SERVER['SERVER_NAME']) ?>
                                 </p>
                             </div>
                         </div>

@@ -39,13 +39,13 @@
                 <div class="sidebar-wrapper">
                     <div class="branding">
                         <div class="sistemLogo">
-                            <?php $img = !empty($adminLogo) ? 'assets/admin/img/' . $adminLogo : 'assets/admin/img/adminLogoBase.png'; ?>
+                            <?php $img = !empty($adminLogo) ? 'assets/admin/img/' . $adminLogo : 'assets/admin/img/adminLogoBase.svg'; ?>
                             <img src="<?= esc(base_url($img)) ?>" alt="Logo">
                         </div>
                     </div>
                     <div class="logo">
-                        <a href="#" class="simple-text logo-mini">CMS</a>
-                        <a href="#" class="simple-text logo-normal">Panel Control</a>
+                        <a href="" class="simple-text logo-mini">CMS</a>
+                        <a href="<?= esc(base_url('admin/panel')) ?>" class="simple-text logo-normal">Panel Control</a>
                     </div>
                     <div class="user">
                         <div class="photo">
