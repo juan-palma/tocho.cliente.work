@@ -7,35 +7,29 @@
 	// 
 	// $usuarioDB = $this->basic_modal->genericSelect('sistema');
 	// print_r($usuarioDB);
-	
-	
-	$userMailTemp = $this->session->userMailTemp;
-	$userEquipoTemp = $this->session->userEquipoTemp;
-	$userLigaTemp = $this->session->userLigaTemp;
-	
-	$idUser = $this->session->idUser;
-	$userMail = $this->session->userMail;
-	
-	if($idUser !== NULL && $idUser !== '' && $userMail !== ''){
-		$mailDisabled = 'disabled';
-	} else{
-		$mailDisabled = "";
-		$userMail = $userMailTemp;
-	}
-	$this->session->urlPeticion = $this->uri->uri_string();
-	
+
+
+
+// Acceso a la sesión con el servicio de CI4
+$session = \Config\Services::session();
+$userMailTemp = $session->get('userMailTemp') ?? '';
+$userEquipoTemp = $session->get('userEquipoTemp') ?? '';
+$userLigaTemp = $session->get('userLigaTemp') ?? '';
+$idUser = $session->get('idUser');
+$userMail = $session->get('userMail') ?? '';
+
+// Determinar si el campo de correo debe estar deshabilitado
+$mailDisabled = ($idUser && $userMail) ? 'disabled' : '';
+$userMail = $idUser && $userMail ? $userMail : $userMailTemp;
+
+// Nota: La asignación de 'urlPeticion' se movió al controlador
 ?>
 
-
-
-
 <div id="mainLoginCustom">
-	<form id="formLoginCustom" action="<?php echo(base_url('productos/login')); ?>" method="post">
-		<input type="email" name="correo" placeholder="email" required <?php echo($mailDisabled); ?> value="<?php echo($userMail); ?>"></input>
-		<input type="text" name="equipo" placeholder="Nombre de equipo"  value="<?php echo($userEquipoTemp); ?>" required></input>
-		<input type="text" name="liga" placeholder="Nombr de liga" value="<?php echo($userLigaTemp); ?>" required></input>
-		
-		<input type="submit" value="Continuar"></input>
-	</form>
-	
+    <form id="formLoginCustom" action="<?= base_url('productos/login') ?>" method="post">
+        <input type="email" name="correo" placeholder="Email" required <?= $mailDisabled ?> value="<?= esc($userMail) ?>" />
+        <input type="text" name="equipo" placeholder="Nombre de equipo" value="<?= esc($userEquipoTemp) ?>" required />
+        <input type="text" name="liga" placeholder="Nombre de liga" value="<?= esc($userLigaTemp) ?>" required />
+        <input type="submit" value="Continuar" />
+    </form>
 </div>

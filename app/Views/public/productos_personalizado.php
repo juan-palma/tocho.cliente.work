@@ -1,38 +1,26 @@
-<div class="mainbox bl1" style="background-image: url(<?php //echo(base_url( 'assets/public/img/productos/productos_hombres_head.png' )); ?> )">
-	<div id="headSec">
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_head.png' )); ?>" />
-	</div>
-	<div class="ligaRapida">
-		<a href="<?php echo(base_url()); ?>">home > </a>
-		<a href="<?php echo(base_url( 'productos/'.$genero )); ?>"><?php echo($genero); ?> > </a>
-		<?php echo($area); ?>
-	</div>
+<?php
+// Lista de prendas para iterar y reducir redundancia
+$prendas = ['body', 'licra', 'short', 'playera', 'sudadera'];
+?>
+
+<div class="mainbox bl1">
+    <div id="headSec">
+        <img src="<?= base_url("assets/public/img/productos/productos_" . esc($genero) . "_" . esc($area) . "_head.png") ?>" alt="Header <?= esc($genero) ?> <?= esc($area) ?>" />
+    </div>
+    <div class="ligaRapida">
+        <a href="<?= base_url() ?>">home &gt; </a>
+        <a href="<?= base_url("productos/" . esc($genero)) ?>"><?= esc($genero) ?> &gt; </a>
+        <span><?= esc($area) ?></span>
+    </div>
 </div>
 
 <div class="mainbox bl2 bl2p">
-	<div class="basicoP">
-		<?php $prenda = "body"; ?>
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_'.$prenda.'.png' )); ?>" />
-		<a href="<?php echo(base_url( 'productos/'.$genero.'/'.$area.'/'.$prenda )); ?>"><div class="btnVerMas">Personalizar</div></a>
-	</div>
-	<div class="basicoP">
-		<?php $prenda = "licra"; ?>
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_'.$prenda.'.png' )); ?>" />
-		<a href="<?php echo(base_url( 'productos/'.$genero.'/'.$area.'/'.$prenda )); ?>"><div class="btnVerMas">Personalizar</div></a>
-	</div>
-	<div class="basicoP">
-		<?php $prenda = "short"; ?>
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_'.$prenda.'.png' )); ?>" />
-		<a href="<?php echo(base_url( 'productos/'.$genero.'/'.$area.'/'.$prenda )); ?>"><div class="btnVerMas">Personalizar</div></a>
-	</div>
-	<div class="basicoP">
-		<?php $prenda = "playera"; ?>
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_'.$prenda.'.png' )); ?>" />
-		<a href="<?php echo(base_url( 'productos/'.$genero.'/'.$area.'/'.$prenda )); ?>"><div class="btnVerMas">Personalizar</div></a>
-	</div>
-	<div class="basicoP">
-		<?php $prenda = "sudadera"; ?>
-		<img src="<?php echo(base_url( 'assets/public/img/productos/productos_'.$genero.'_'.$area.'_'.$prenda.'.png' )); ?>" />
-		<a href="<?php echo(base_url( 'productos/'.$genero.'/'.$area.'/'.$prenda )); ?>"><div class="btnVerMas">Personalizar</div></a>
-	</div>
+    <?php foreach ($prendas as $prenda): ?>
+        <div class="basicoP">
+            <img src="<?= base_url("assets/public/img/productos/productos_" . esc($genero) . "_" . esc($area) . "_" . esc($prenda) . ".png") ?>" alt="<?= esc($prenda) ?> <?= esc($genero) ?>" />
+            <a href="<?= base_url("productos/" . esc($genero) . "/" . esc($area) . "/" . esc($prenda)) ?>">
+                <div class="btnVerMas">Personalizar</div>
+            </a>
+        </div>
+    <?php endforeach; ?>
 </div>

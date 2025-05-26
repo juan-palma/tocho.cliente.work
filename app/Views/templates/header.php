@@ -36,6 +36,12 @@
 		
 		<?php echo link_tag('assets/public/css/main.css'); ?>
 		<!--<link href="<?php echo(base_url('assets/public/css/main.css')) ?>" rel="stylesheet" type="text/css">-->
+
+		<meta property="og:title" content="<?php echo($titulo); ?>" />
+		<meta property="og:description" content="<?php echo($generalDB->desc_global); ?>" />
+		<meta property="og:image" content="https://tocho.cliente.work/public/assets/public/img/facebook_web_img_article.jpg" />
+		<meta property="og:image:alt" content="Portada del sitio web principal" />
+		<meta property="og:image:type" content="image/jpeg" />
 				
 		
 		<!-- Meta Data de verificacion de sitios web. -->
@@ -473,7 +479,7 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 		
 		
 
-		<div id="menuItems" class="dnone">
+		<!--<div id="menuItems" class="dnone">
 			<div id="menuItemClose"><i class="fas fa-times"></i></div>
 			
 			<div class="redes">
@@ -492,20 +498,8 @@ if(property_exists($generalDB, "youtube") && $generalDB->youtube !== ''){
 				?>
 			</div>
 				
-			<div class="boxCentro">
-				<div class="boxCentrado">
-					<div class="menuHi"><a href="<?php echo(base_url('servicios') ); ?>">SERVICIOS</a></div><br />
-					<?php
-					 foreach ($serviciosDB->servicios as $i=>$v) {
-						?>
-						<div class="menuLow"><a href="<?php echo(base_url('servicios/articulo/'.url_title($v->enlace) )); ?>"><?php echo($v->titulo); ?></a></div><br />
-						<?php
-					} 
-					?>
-					<div id="menuPortafolio" class="menuHi"><a href="<?php echo(base_url('portafolio') ); ?>">PORTAFOLIO</a></div><br />
-				</div>
-			</div>
-		</div>
+			
+		</div>-->
 
 		
 		

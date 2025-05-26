@@ -76,7 +76,7 @@
 
 <!-- sección HOME SERVICIOS -->
 
-<section id="servicios" class="mainbox bl3">
+<!--<section id="servicios" class="mainbox bl3">
 	<div class="box2">
 		<?php
 			if(property_exists($serviciosDB, "titulo") && $serviciosDB->titulo !== ''){
@@ -101,7 +101,7 @@
 		</main>
 		<a href="<?php echo( base_url('servicios') ); ?>" target="_self"><div class="servicioTextoBtn btnVerMas"><?php echo(@$serviciosDB->textoBtn); ?></div></a>
 	</div>
-</section>
+</section>-->
 
 
 
